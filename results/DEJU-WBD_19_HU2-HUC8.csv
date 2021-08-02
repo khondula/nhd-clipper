@@ -1,0 +1,3 @@
+objectid,tnmid,metasource,sourcedata,sourceorig,sourcefeat,loaddate,referenceg,areaacres,areasqkm,states,huc8,name,shape_Leng,shape_Area,neon_siteID,huc2
+116,{D496A295-1991-4A6E-BC1F-E78B98E8E112},NA,NA,NA,NA,2020-10-22,NA,1076502.86,4356.46,AK,19080304,Delta River,7.65470859706,0.784074898625,DEJU,WBD_19_HU2
+164,{F1EF081E-D9ED-4830-9B99-FD0989B26D6E},NA,NA,NA,NA,2021-01-13,NA,3192517.14,12919.67,AK,19080303,Healy Lake-Tanana River,10.082624685,2.36065774827,DEJU,WBD_19_HU2

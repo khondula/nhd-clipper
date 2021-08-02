@@ -1,0 +1,3 @@
+objectid,tnmid,metasource,sourcedata,sourceorig,sourcefeat,loaddate,referenceg,areaacres,areasqkm,states,huc8,name,shape_Leng,shape_Area,neon_siteID
+28,{92491071-FD30-4CA2-BB44-3F2C24CA4AE5},NA,NA,NA,NA,2012-06-11,NA,3532103.44,14293.93,"MX,NM,TX",13030102,El Paso-Las Cruces,10.716875947,1.35937925314,JORN
+38,{C07C1E9A-433A-480C-BABD-81181068AC59},NA,NA,NA,NA,2012-06-11,NA,799713.29,3236.33,NM,13030103,Jornada Draw,3.36058456682,0.311732339603,JORN

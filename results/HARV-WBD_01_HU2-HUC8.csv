@@ -1,0 +1,3 @@
+objectid,tnmid,metasource,sourcedata,sourceorig,sourcefeat,loaddate,referenceg,areaacres,areasqkm,states,huc8,name,shape_Leng,shape_Area,neon_siteID,huc2
+13,{359804A2-DAFB-4E7E-8AAF-04941102352B},NA,NA,NA,NA,2020-11-16,NA,462352.73,1871.08,MA,01080204,Chicopee River,3.49005958165,0.204348795608,HARV,WBD_01_HU2
+36,{202F9EA7-D797-4B0A-AEE9-B65D017CD3BD},NA,NA,NA,NA,2020-11-16,NA,249014.78,1007.73,"MA,NH",01080202,Millers River,2.65971612764,0.110622664991,HARV,WBD_01_HU2

@@ -1,0 +1,3 @@
+objectid,tnmid,metasource,sourcedata,sourceorig,sourcefeat,loaddate,referenceg,areaacres,areasqkm,states,huc8,name,shape_Leng,shape_Area,neon_siteID
+91,{48A0209F-CF8F-4174-ABDD-D25BF5E78D41},NA,NA,NA,NA,2012-06-11,NA,3527933.42,14277.05,AK,19060402,Sagavanirktok River,16.5477952086,3.20630925721,OKSR
+140,{4AE78548-F15B-416E-B85E-DD7B2E9D45F6},NA,NA,NA,NA,2020-06-25,NA,2989493.19,12098.06,AK,19060401,Kuparuk River,12.0148100543,2.79650379287,OKSR

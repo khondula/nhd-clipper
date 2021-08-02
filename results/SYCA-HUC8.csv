@@ -1,0 +1,3 @@
+objectid,tnmid,metasource,sourcedata,sourceorig,sourcefeat,loaddate,referenceg,areaacres,areasqkm,states,huc8,name,shape_Leng,shape_Area,neon_siteID
+38,{CF795DB8-822B-4CA4-8D4F-4319336979AA},NA,NA,NA,NA,2012-06-11,NA,671097.36,2715.84,AZ,15060105,Tonto,3.17154819627,0.265184669003,SYCA
+46,{7FA30917-AEDB-473B-9E55-84FF0403C413},NA,NA,NA,NA,2021-01-21,NA,1258665.09,5093.64,AZ,15060203,Lower Verde,5.40941320207,0.498091816846,SYCA
