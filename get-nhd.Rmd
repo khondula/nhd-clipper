@@ -76,8 +76,15 @@ my_site <- neon_sites[1]
 
 ```{r}
 #############
+my_site <- 'UNDE' # 02, 07
+my_site <- 'COMO' # 10, 14
+my_site <- 'MLBS' # 02, 05
+
+huc2_path <- huc2_paths[14]
+
 nhd_stuff_for_site <- function(my_site, huc2_path){
 
+  huc2_id <- basename(huc2_path) %>% substr(1, 10)
   my_huc8_path <- huc2_path %>% 
     fs::dir_ls(recurse = TRUE, glob = '*WBDHU8.shp')
   
@@ -89,23 +96,26 @@ nhd_stuff_for_site <- function(my_site, huc2_path){
     st_union() %>% st_as_sf()
   
   fboxes_x_huc8_mat <- st_intersects(my_huc8, my_site_sf, sparse = FALSE)
-huc8_wSite <- which(fboxes_x_huc8_mat[,1])
+  huc8_wSite <- which(fboxes_x_huc8_mat[,1])
 
-huc8_sf <- my_huc8[fboxes_x_huc8_mat, ]
+  huc8_sf <- my_huc8[fboxes_x_huc8_mat, ]
 
-huc8_id <- huc8_sf$huc8
+  huc8_id <- huc8_sf$huc8
 
-huc8_sf %>% st_drop_geometry() %>% 
-  mutate(neon_siteID = my_site) %>%
-  write_csv(glue('results/{my_site}-HUC8.csv'))
+  huc8_sf %>% st_drop_geometry() %>% 
+    mutate(neon_siteID = my_site) %>%
+    mutate(huc2 = huc2_id) %>%
+    write_csv(glue('results/{my_site}-{huc2_id}-HUC8.csv'))
 
-huc8_sf %>% st_union() %>% st_as_sf() %>%
-  st_write(glue('results/fbox-x-huc8/{my_site}-HUC8.shp'))
+  huc8_sf %>% st_union() %>% st_as_sf() %>%
+    st_write(glue('results/fbox-x-huc8/{my_site}-{huc2_id}-HUC8.shp'), append = FALSE)
 
-ggplot() + 
-  geom_sf(data = huc8_sf) +
-  geom_sf(data = my_site_sf, fill = NA) +
-  ggtitle(glue('{my_site} in {huc8_sf$huc8} ({huc8_sf$name})'))
+  ggplot() + 
+    geom_sf(data = huc8_sf) +
+    geom_sf(data = my_site_sf, fill = NA) +
+    ggtitle(glue('{my_site} in {huc2_id}'))
+  
+  ggsave(glue('figs/{my_site}-{huc2_id}.png'))
 
 
 # Download NHD high res for HUC8
@@ -135,7 +145,7 @@ ggplot() +
   ggtitle(glue('{my_site} flightbox NHD HUC8 waterbodies')) +
   theme_void()
 
-ggsave(glue('figs/nhd-waterbodies-{my_site}.png'))
+ggsave(glue('figs/nhd-waterbodies-{my_site}-{huc2_id}.png'))
 
 ggplot() + 
   geom_sf(data = huc8_sf, aes(fill = name)) +
@@ -145,7 +155,7 @@ ggplot() +
   ggtitle(glue('{my_site} flightbox NHD HUC8 flowlines')) +
   theme_void()
 
-ggsave(glue('figs/nhd-lines-{my_site}.png'))
+ggsave(glue('figs/nhd-lines-{my_site}-{huc2_id}.png'))
 
 ggplot() + 
   geom_sf(data = huc8_sf, aes(fill = name)) +
@@ -154,7 +164,7 @@ ggplot() +
   ggtitle(glue('{my_site} flightbox NHD HUC8 area')) +
   theme_void()
 
-ggsave(glue('figs/nhd-area-{my_site}.png'))
+ggsave(glue('figs/nhd-area-{my_site}-{huc2_id}.png'))
 
 # Calculate areas 
 
@@ -171,7 +181,7 @@ fl_in_fbox %>%
   theme_void() +
   ggtitle(glue('{my_site} flightbox NHD'))
 
-ggsave(glue('figs/{my_site}-NHD.png'))
+ggsave(glue('figs/{my_site}-NHD-{huc2_id}.png'))
 
 
 nhd_flowlines_m <- fl_in_fbox %>% st_length() %>% sum() %>% as.numeric()
@@ -183,24 +193,33 @@ df_xType <- fl_in_fbox %>%
   group_by(FCode) %>%
   summarise(sum_length = sum(length_m), n_segments = n()) %>%
   mutate(sum_length_km = sum_length/1000) %>% 
-  arrange(-sum_length_km) %>% mutate(siteID = my_site)
+  arrange(-sum_length_km) %>% mutate(siteID = my_site) %>%
+  mutate(huc2 = huc2_id)
 
 df <- data.frame(siteID = my_site,
            fbox_area_km2 = as.numeric(st_area(my_site_sf))/1e6,
            nhd_length_m = nhd_flowlines_m,
            nhd_length_km = nhd_flowlines_m/100,
            nhd_wb_area_m2 = nhd_wb_area_m2,
-           nhd_wb_area_km2 = nhd_wb_area_m2/1e6)
+           nhd_wb_area_km2 = nhd_wb_area_m2/1e6) %>%
+  mutate(huc2 = huc2_id)
 
 df %>% write_csv(glue('results/fbox-nhd-stats/{my_site}-nhd-stats.csv'))
 df_xType %>% write_csv(glue('results/fbox-nhd-stats/{my_site}-nhd-stats-xFCode.csv'))
 }
 
-neon_sites_in_huc2[2]
+neon_sites_in_huc2[5]
 huc2_paths <- names(neon_sites_in_huc2)
+nhd_stuff_for_site('UNDE', huc2_paths[7])
+nhd_stuff_for_site('UNDE', huc2_paths[2])
+nhd_stuff_for_site('NIWO', huc2_paths[10])
+nhd_stuff_for_site('NIWO', huc2_paths[14])
 
-for(i in 4:22){
+for(i in 6:22){
 purrr::walk2(neon_sites_in_huc2[[i]], huc2_paths[i], ~nhd_stuff_for_site(.x, .y))}
 
 ```
 
+For any site that spans multiple HUC2s this won't 
+
+re-do for: CRAM/UNDE, NIWO/COMO
