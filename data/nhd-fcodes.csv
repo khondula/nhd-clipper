@@ -1,0 +1,32 @@
+﻿Feature Type,FCode,Description,Description2
+ARTIFICIAL PATH,55800,feature type only: no attributes,
+CANAL/DITCH,33600,feature type only: no attributes,
+CANAL/DITCH,33601,Canal/Ditch Type|aqueduct,aqueduct
+CANAL/DITCH,33603,Canal/Ditch Type|stormwater,stormwater
+COASTLINE,56600,feature type only: no attributes,
+CONNECTOR,33400,feature type only: no attributes,
+PIPELINE,42800,feature type only: no attributes,
+PIPELINE,42801,Product|water; Pipeline Type|aqueduct; Relationship to Surface|at or near,
+PIPELINE,42802,Product|water; Pipeline Type|aqueduct; Relationship to Surface|elevated,
+PIPELINE,42803,Product|water; Pipeline Type|aqueduct; Relationship to Surface|underground,
+PIPELINE,42804,Product|water; Pipeline Type|aqueduct; Relationship to Surface|underwater,
+PIPELINE,42805,Product|water; Pipeline Type|general case; Relationship to Surface|at or near,
+PIPELINE,42806,Product|water; Pipeline Type|general case; Relationship to Surface|elevated,
+PIPELINE,42807,Product|water; Pipeline Type|general case; Relationship to Surface|underground,
+PIPELINE,42808,Product|water; Pipeline Type|general case; Relationship to Surface|underwater,
+PIPELINE,42809,Product|water; Pipeline Type|penstock; Relationship to Surface|at or near,
+PIPELINE,42810,Product|water; Pipeline Type|penstock; Relationship to Surface|elevated,
+PIPELINE,42811,Product|water; Pipeline Type|penstock; Relationship to Surface|underground,
+PIPELINE,42812,Product|water; Pipeline Type|penstock; Relationship to Surface|underwater,
+PIPELINE,42813,Product|water; Pipeline Type|siphon; Relationship to Surface|unspecified,
+PIPELINE,42814,Product|water; Pipeline Type|general case,
+PIPELINE,42815,Product|water; Pipeline Type|penstock,
+PIPELINE,42816,Product|water; Pipeline Type|aqueduct,
+STREAM/RIVER,46000,feature type only: no attributes,
+STREAM/RIVER,46003,Hydrographic Category|intermittent,intermittent
+STREAM/RIVER,46006,Hydrographic Category|perennial,perennial
+STREAM/RIVER,46007,Hydrographic Category|ephemeral,ephemeral
+UNDERGROUND CONDUIT,42000,feature type only: no attributes,
+UNDERGROUND CONDUIT,42001,Positional Accuracy|definite,
+UNDERGROUND CONDUIT,42002,Positional Accuracy|indefinite,
+UNDERGROUND CONDUIT,42003,Positional Accuracy|appoximate,
