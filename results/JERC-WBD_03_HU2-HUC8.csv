@@ -1,0 +1,3 @@
+objectid,tnmid,metasource,sourcedata,sourceorig,sourcefeat,loaddate,referenceg,areaacres,areasqkm,states,huc8,name,shape_Leng,shape_Area,neon_siteID,huc2
+126,{9EEB18AA-C81E-485C-A376-897EBCF7EB5A},NA,NA,NA,NA,2012-06-11,NA,815604.02,3300.64,"FL,GA",03130008,Lower Flint,4.47871230514,0.312366663514,JERC,WBD_03_HU2
+127,{15A52322-1FAA-47AF-91E0-7FAD27246160},NA,NA,NA,NA,2012-06-11,NA,706591.81,2859.48,GA,03130009,Ichawaynochaway,2.94769779057,0.271747926145,JERC,WBD_03_HU2

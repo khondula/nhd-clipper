@@ -1,0 +1,3 @@
+objectid,tnmid,metasource,sourcedata,sourceorig,sourcefeat,loaddate,referenceg,areaacres,areasqkm,states,huc8,name,shape_Leng,shape_Area,neon_siteID,huc2
+35,{245E1BED-9BDD-401E-8361-9EC35F6E387E},NA,NA,NA,NA,2012-06-11,NA,589332.15,2384.94,AZ,15050302,Rillito,3.24174251353,0.227758736187,SRER,WBD_15_HU2
+47,{EE94F429-A5EE-4583-8558-00435EF322A7},NA,NA,NA,NA,2020-06-04,NA,1680515.46,6800.81,"AZ,MX",15050301,Upper Santa Cruz,6.2458223074,0.647307555365,SRER,WBD_15_HU2
