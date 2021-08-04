@@ -1,0 +1,51 @@
+---
+title: "calculate areas"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+fcodes_fl <- readr::read_csv('data/nhd-fcodes.csv', col_types = 'cccc') %>%
+  rename(ftype = 1)
+fcodes_wb <- readr::read_csv('data/nhd-fcodes-waterbody.csv')
+nhd_df <- fs::dir_ls('results/fbox-nhd-stats', glob = '*xFCode.csv') %>%
+  purrr::map_df(~read_csv(.x, col_types = 'cdddcc'))
+```
+
+```{r}
+nhd_df2 <- nhd_df %>%
+  group_by(FCode, siteID) %>%
+  summarise(sum_segments = sum(n_segments),
+            sum_length_km = sum(sum_length_km)) %>%
+  left_join(fcodes_fl)
+
+unique(nhd_df2$ftype)
+
+nhd_df2_streamriver <- dplyr::filter(nhd_df2, ftype == 'STREAM/RIVER')
+nhd_df2_other <- dplyr::filter(nhd_df2, ftype != 'STREAM/RIVER')
+
+nhd_df2_streamriver %>%
+  dplyr::filter(sum_length_km > 0) %>%
+  ggplot(aes(x = siteID, y = sum_length_km)) +
+  geom_bar(stat = 'identity', aes(fill = FCode)) +
+  coord_flip()
+
+nhd_df2_streamriver %>%
+  ungroup() %>%
+  group_by(FCode, Description) %>%
+  summarise(sum_fcode_km = sum(sum_length_km), n_segments = sum(sum_segments))
+
+nhd_df2_other %>%
+  ggplot(aes(x = siteID, y = sum_length_km)) +
+  geom_bar(stat = 'identity', aes(fill = FCode)) +
+  coord_flip() +
+  facet_wrap(vars(ftype), scales = 'free')
+
+```
+

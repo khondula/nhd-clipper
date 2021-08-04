@@ -18,7 +18,7 @@ library(tidyverse)
 ```
 
 ```{r}
-local_dir <- 'H:/DATA/NHD'
+# local_dir <- 'H:/DATA/NHD'
 ```
 
 Download and unzip WBD by HUC 2
@@ -26,20 +26,21 @@ Download and unzip WBD by HUC 2
 * [link to downloads](https://prd-tnm.s3.amazonaws.com/index.html?prefix=StagedProducts/Hydrography/WBD/HU2/Shape)
 
 ```{r, eval = FALSE}
-huc2codes <- str_pad(1:22, 2, 'left', '0')
-nhd_download_urls <- glue('https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/WBD/HU2/Shape/WBD_{huc2codes}_HU2_Shape.zip')
-local_zips <- basename(nhd_download_urls)
-
-purrr::walk2(nhd_download_urls, local_zips, ~download.file(url = .x, destfile = .y))
-local_dir <- 'H:/DATA/NHD'
-fs::dir_create(local_dir)
-local_filepaths <- glue('{local_dir}/{tools::file_path_sans_ext(local_zips)}')
-purrr::walk2(local_zips, local_filepaths, ~unzip(zipfile = .x, exdir = .y))
-fs::file_delete(local_zips)
+# huc2codes <- str_pad(1:22, 2, 'left', '0')
+# nhd_download_urls <- glue('https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/WBD/HU2/Shape/WBD_{huc2codes}_HU2_Shape.zip')
+# local_zips <- basename(nhd_download_urls)
+# 
+# purrr::walk2(nhd_download_urls, local_zips, ~download.file(url = .x, destfile = .y))
+# local_dir <- 'H:/DATA/NHD'
+# fs::dir_create(local_dir)
+# local_filepaths <- glue('{local_dir}/{tools::file_path_sans_ext(local_zips)}')
+# purrr::walk2(local_zips, local_filepaths, ~unzip(zipfile = .x, exdir = .y))
+# fs::file_delete(local_zips)
 ```
 
 # Find HUC 8 for your polygon
 
+PUUM
 ```{r}
 HI_wbd_url <- 'https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/State/HighResolution/Shape/NHD_H_Hawaii_State_Shape.zip'
 download.file(HI_wbd_url, basename(HI_wbd_url))
@@ -159,8 +160,14 @@ df_xType %>% write_csv(glue('results/fbox-nhd-stats/{my_site}-nhd-stats-xFCode.c
 
 
 ```{r}
+nhd_dir <- 'H:/DATA/NHD'
+nhd_dir <- '/Volumes/hondula/DATA/NHD'
+fboxes_dir <- '/Volumes/hondula/DATA/spatial/aop_boxes'
+```
 
-huc2_paths <- fs::dir_ls('H:/DATA/NHD', glob = '*WBD*HU2*', recurse = FALSE, type = 'directory')
+```{r}
+
+huc2_paths <- fs::dir_ls(nhd_dir, glob = '*WBD*HU2*', recurse = FALSE, type = 'directory')
 
 huc2_path <- huc2_paths[2]
 
@@ -169,7 +176,7 @@ find_sites_in_huc2 <- function(huc2_path){
     fs::dir_ls(recurse = TRUE, glob = '*WBDHU2.shp')
   my_huc2 <- st_read(my_huc2_path)
 
-  my_fboxes <- st_read('H:/DATA/spatial/aop_boxes/AOP_flightboxesAllSites.shp')
+  my_fboxes <- st_read(glue('{fboxes_dir}/fboxes_nodups.shp'))
   my_fboxes_prj <- my_fboxes %>% st_transform(st_crs(my_huc2))
   fboxes_in_huc_mat <- st_intersects(my_fboxes_prj, my_huc2, sparse = FALSE)
   neon_sites <- c()
@@ -200,6 +207,9 @@ my_site <- 'MLBS' # 02, 05
 
 huc2_path <- huc2_paths[14]
 
+my_site <- 'BART'
+huc2_path <- huc2_paths[1]
+
 nhd_stuff_for_site <- function(my_site, huc2_path){
 
   huc2_id <- basename(huc2_path) %>% substr(1, 10)
@@ -208,16 +218,15 @@ nhd_stuff_for_site <- function(my_site, huc2_path){
   
   my_huc8 <- st_read(my_huc8_path)
   
-  my_fboxes <- st_read('H:/DATA/spatial/aop_boxes/AOP_flightboxesAllSites.shp')
-  my_fboxes_prj <- my_fboxes %>% st_transform(st_crs(my_huc2))
+  my_fboxes <- st_read(glue('{fboxes_dir}/fboxes_nodups.shp'))
+  my_fboxes_prj <- my_fboxes %>% st_transform(st_crs(my_huc8))
   my_site_sf <- dplyr::filter(my_fboxes_prj, siteID == my_site) %>%
     st_union() %>% st_as_sf()
-  
+  # site_area_km2 <- my_site_sf %>% st_area()/1e6
   fboxes_x_huc8_mat <- st_intersects(my_huc8, my_site_sf, sparse = FALSE)
   huc8_wSite <- which(fboxes_x_huc8_mat[,1])
 
   huc8_sf <- my_huc8[fboxes_x_huc8_mat, ]
-
   huc8_id <- huc8_sf$huc8
 
   huc8_sf %>% st_drop_geometry() %>% 
@@ -232,98 +241,124 @@ nhd_stuff_for_site <- function(my_site, huc2_path){
     geom_sf(data = huc8_sf) +
     geom_sf(data = my_site_sf, fill = NA) +
     ggtitle(glue('{my_site} in {huc2_id}'))
-  
   ggsave(glue('figs/{my_site}-{huc2_id}.png'))
 
+  # Download NHD high res for HUC8
+  nhd_local_path <- glue('{nhd_dir}/NHD_H_{huc8_id}_HU8_Shape')
 
-# Download NHD high res for HUC8
+  if(!fs::dir_exists(nhd_local_path)){
+    nhdhr_urls <- glue('https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/HU8/HighResolution/Shape/NHD_H_{huc8_id}_HU8_Shape.zip')
+    base_path_zip <- basename(nhdhr_urls)
+    purrr::walk2(nhdhr_urls, base_path_zip, ~download.file(.x, .y))
+    local_path <- glue('{nhd_dir}/{tools::file_path_sans_ext(base_path_zip)}')
+    purrr::walk2(base_path_zip, local_path, ~unzip(.x, exdir = .y))
+    fs::file_delete(base_path_zip)
+  }
 
-nhdhr_urls <- glue('https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/HU8/HighResolution/Shape/NHD_H_{huc8_id}_HU8_Shape.zip')
-base_path_zip <- basename(nhdhr_urls)
-purrr::walk2(nhdhr_urls, base_path_zip, ~download.file(.x, .y))
-local_path <- glue('{local_dir}/{tools::file_path_sans_ext(base_path_zip)}')
-purrr::walk2(base_path_zip, local_path, ~unzip(.x, exdir = .y))
-fs::file_delete(base_path_zip)
+  my_flowlines <- nhd_local_path %>% 
+    fs::dir_ls(recurse = TRUE, glob = '*NHDFlowline.shp')
+  flowline_attr <- nhd_local_path %>%
+    fs::dir_ls(recurse = TRUE, glob = '*NHDFlowlineVAA.dbf')
+  my_waterbodies <- nhd_local_path %>% 
+    fs::dir_ls(recurse = TRUE, glob = '*NHDWaterbody.shp')
+  my_nhdarea <- nhd_local_path %>% 
+    fs::dir_ls(recurse = TRUE, glob = '*NHDArea.shp')
+  # read in as sf objects
+  my_fl_vaa <- purrr::map(flowline_attr, ~st_read(.x)) %>% 
+    bind_rows() %>% dplyr::select(Permanent_, StreamOrde)
+  my_fl_sf <- purrr::map(my_flowlines, ~st_read(.x)) %>% bind_rows()
+  my_fl_sf_join <- my_fl_sf %>% 
+    left_join(my_fl_vaa, by = c('Permanent_')) %>% st_zm()
+  my_wb_sf <- purrr::map(my_waterbodies, ~st_read(.x)) %>% bind_rows()
+  my_area_sf <- purrr::map(my_nhdarea, ~st_read(.x)) %>% bind_rows()
 
-my_flowlines <- local_path %>% 
-  fs::dir_ls(recurse = TRUE, glob = '*NHDFlowline.shp')
-my_waterbodies <- local_path %>% 
-  fs::dir_ls(recurse = TRUE, glob = '*NHDWaterbody.shp')
-my_nhdarea <- local_path %>% 
-  fs::dir_ls(recurse = TRUE, glob = '*NHDArea.shp')
-my_fl_sf <- purrr::map(my_flowlines, ~st_read(.x)) %>% bind_rows()
-my_wb_sf <- purrr::map(my_waterbodies, ~st_read(.x)) %>% bind_rows()
-my_area_sf <- purrr::map(my_nhdarea, ~st_read(.x)) %>% bind_rows()
-
-ggplot() + 
-  geom_sf(data = huc8_sf, aes(fill = name)) +
-  geom_sf(data = my_wb_sf, fill = 'dodgerblue', col = 'blue', lwd = 0.1) +
-  # geom_sf(data = my_fl_sf, col = 'blue') +
-  geom_sf(data = my_site_sf, col = 'black', fill = NA) +
-  ggtitle(glue('{my_site} flightbox NHD HUC8 waterbodies')) +
-  theme_void()
-
-ggsave(glue('figs/nhd-waterbodies-{my_site}-{huc2_id}.png'))
-
-ggplot() + 
-  geom_sf(data = huc8_sf, aes(fill = name)) +
-  # geom_sf(data = my_wb_sf, fill = 'dodgerblue', col = 'dodgerblue') +
-  geom_sf(data = my_fl_sf, col = 'blue') +
-  geom_sf(data = my_site_sf, col = 'black', fill = NA) +
-  ggtitle(glue('{my_site} flightbox NHD HUC8 flowlines')) +
-  theme_void()
-
-ggsave(glue('figs/nhd-lines-{my_site}-{huc2_id}.png'))
-
-ggplot() + 
-  geom_sf(data = huc8_sf, aes(fill = name)) +
-  geom_sf(data = my_area_sf, col = 'blue') +
-  geom_sf(data = my_site_sf, col = 'black', fill = NA) +
-  ggtitle(glue('{my_site} flightbox NHD HUC8 area')) +
-  theme_void()
-
-ggsave(glue('figs/nhd-area-{my_site}-{huc2_id}.png'))
-
-# Calculate areas 
-
-fl_in_fbox <- st_intersection(my_site_sf, st_zm(my_fl_sf))
-wb_in_fbox <- st_intersection(my_site_sf, st_zm(my_wb_sf))
-
-fl_in_fbox %>% 
   ggplot() + 
-  geom_sf(data = wb_in_fbox, aes(fill = as.factor(FCode)), col = NA) +
-  geom_sf(aes(col = as.factor(FCode))) + 
-  geom_sf(data = my_site_sf, fill = NA) +
-  scale_fill_discrete_sequential(palette = 'Dark Mint') +
-  scale_color_discrete_sequential(palette = 'Peach') +
-  theme_void() +
-  ggtitle(glue('{my_site} flightbox NHD'))
+    geom_sf(data = huc8_sf, aes(fill = name)) +
+    geom_sf(data = my_wb_sf, fill = 'dodgerblue', col = 'blue', lwd = 0.1) +
+    geom_sf(data = my_site_sf, col = 'black', fill = NA) +
+    ggtitle(glue('{my_site} flightbox NHD HUC8 waterbodies')) +
+    theme_void()
 
-ggsave(glue('figs/{my_site}-NHD-{huc2_id}.png'))
+  ggsave(glue('figs/nhd-waterbodies-{my_site}-{huc2_id}.png'))
 
+  ggplot() + 
+    geom_sf(data = huc8_sf, aes(fill = name)) +
+    geom_sf(data = my_fl_sf, col = 'blue') +
+    geom_sf(data = my_site_sf, col = 'black', fill = NA) +
+    ggtitle(glue('{my_site} flightbox NHD HUC8 flowlines')) +
+    theme_void()
 
-nhd_flowlines_m <- fl_in_fbox %>% st_length() %>% sum() %>% as.numeric()
-nhd_wb_area_m2 <- wb_in_fbox %>% st_area() %>% sum() %>% as.numeric()
+  ggsave(glue('figs/nhd-lines-{my_site}-{huc2_id}.png'))
 
-df_xType <- fl_in_fbox %>% 
-  mutate(length_m = nhd_flowlines_m) %>%
-  st_drop_geometry() %>%
-  group_by(FCode) %>%
-  summarise(sum_length = sum(length_m), n_segments = n()) %>%
-  mutate(sum_length_km = sum_length/1000) %>% 
-  arrange(-sum_length_km) %>% mutate(siteID = my_site) %>%
-  mutate(huc2 = huc2_id)
+  ggplot() + 
+    geom_sf(data = huc8_sf, aes(fill = name)) +
+    geom_sf(data = my_area_sf, col = 'blue') +
+    geom_sf(data = my_site_sf, col = 'black', fill = NA) +
+    ggtitle(glue('{my_site} flightbox NHD HUC8 area')) +
+    theme_void()
 
-df <- data.frame(siteID = my_site,
+  ggsave(glue('figs/nhd-area-{my_site}-{huc2_id}.png'))
+
+  # Calculate areas 
+
+  fl_in_fbox <- st_intersection(my_site_sf, my_fl_sf_join)
+  wb_in_fbox <- st_intersection(my_site_sf, st_zm(my_wb_sf))
+
+  fl_in_fbox %>% 
+    ggplot() + 
+    geom_sf(data = wb_in_fbox, aes(fill = as.factor(FCode)), col = NA) +
+    geom_sf(aes(col = as.factor(FCode))) + 
+    # geom_sf(aes(col = as.factor(StreamOrde))) + 
+    geom_sf(data = my_site_sf, fill = NA) +
+    scale_fill_discrete_sequential(palette = 'Dark Mint') +
+    scale_color_discrete_sequential(palette = 'Peach') +
+    theme_void() +
+    ggtitle(glue('{my_site} flightbox NHD'))
+
+  ggsave(glue('figs/{my_site}-NHD-{huc2_id}.png'))
+
+  nhd_flowlines_m <- fl_in_fbox %>% st_length()
+  length_unit <- units::deparse_unit(nhd_flowlines_m)
+  nhd_wb_area_m2 <- wb_in_fbox %>% st_area() 
+  area_unit <- units::deparse_unit(nhd_wb_area_m2)
+
+  fl_df_xType <- fl_in_fbox %>% 
+    mutate(length_m = as.numeric(nhd_flowlines_m)) %>%
+    st_drop_geometry() %>%
+    group_by(FCode) %>%
+    summarise(sum_length = sum(length_m), n_segments = n()) %>%
+    mutate(sum_length_km = sum_length/1000) %>% 
+    arrange(-sum_length_km) %>% 
+    mutate(check_m = length_unit) %>%
+    mutate(siteID = my_site) %>%
+    mutate(huc2 = huc2_id)
+
+  wb_areas1ha <- wb_in_fbox %>% 
+    mutate(area_m2 = as.numeric(nhd_wb_area_m2)) %>%
+    st_drop_geometry() %>% 
+    arrange(-area_m2) %>% 
+    dplyr::filter(area_m2 >= 10000)
+  
+  wb_df_xType <- wb_areas %>% 
+    group_by(FCode) %>%
+    summarise(sum_area = sum(area_m2), n_bodies = n()) %>%
+    mutate(sum_area_km2 = sum_area/1e6) %>% 
+    arrange(-sum_area_km2) %>% 
+    mutate(check_m2 = area_unit) %>%
+    mutate(siteID = my_site) %>%
+    mutate(huc2 = huc2_id)
+
+  df <- data.frame(siteID = my_site,
            fbox_area_km2 = as.numeric(st_area(my_site_sf))/1e6,
-           nhd_length_m = nhd_flowlines_m,
-           nhd_length_km = nhd_flowlines_m/100,
-           nhd_wb_area_m2 = nhd_wb_area_m2,
-           nhd_wb_area_km2 = nhd_wb_area_m2/1e6) %>%
+           nhd_length_km = sum(fl_df_xType$sum_length_km),
+           nhd_wb_area_km2 = sum(wb_df_xType$sum_area_km2),
+           nhd_n1ha = nrow(wb_areas1ha)) %>%
   mutate(huc2 = huc2_id)
 
-df %>% write_csv(glue('results/fbox-nhd-stats/{my_site}-nhd-stats.csv'))
-df_xType %>% write_csv(glue('results/fbox-nhd-stats/{my_site}-nhd-stats-xFCode.csv'))
+df %>% write_csv(glue('results/fbox-nhd-stats/site/{my_site}-nhd-stats.csv'))
+fl_df_xType %>% write_csv(glue('results/fbox-nhd-stats/flowlines/{my_site}-nhd-stats-xFCode.csv'))
+wb_df_xType %>% write_csv(glue('results/fbox-nhd-stats/waterbodies/{my_site}-nhd-stats-xFCode.csv'))
+wb_areas1ha %>% write_csv(glue('results/fbox-nhd-stats/wb1ha//{my_site}-nhd-stats-xFCode.csv'))
 }
 
 neon_sites_in_huc2[5]
