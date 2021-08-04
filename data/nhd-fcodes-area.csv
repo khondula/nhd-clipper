@@ -1,0 +1,29 @@
+﻿ftype,FCode,Description
+AREA OF COMPLEX CHANNELS,53700,feature type only: no attributes
+AREA TO BE SUBMERGED,30700,feature type only: no attributes
+BAY/INLET,31200,feature type only: no attributes
+BRIDGE,31800,feature type only: no attributes
+CANAL/DITCH,33600,feature type only: no attributes
+CANAL/DITCH,33601,Canal/Ditch Type|aqueduct
+CANAL/DITCH,33603,Canal/Ditch Type|stormwater
+DAM/WEIR,34300,feature type only: no attributes
+DAM/WEIR,34305,Construction Material|earthen
+DAM/WEIR,34306,Construction Material|nonearthen
+FLUME,36200,feature type only: no attributes
+FORESHORE,36400,feature type only: no attributes
+INUNDATION AREA,40300,feature type only: no attributes
+INUNDATION AREA,40307,Inundation Control Status|not controlled
+INUNDATION AREA,40308,Inundation Control|controlled
+INUNDATION AREA,40309,Inundation Control|controlled; Stage|flood elevation
+LEVEE,56800,feature type only: no attributes
+LOCK CHAMBER,39800,feature type only: no attributes
+RAPIDS,43100,feature type only: no attributes
+SEA/OCEAN,44500,feature type only: no attributes
+SPILLWAY,45500,feature type only: no attributes
+STREAM/RIVER,46000,feature type only: no attributes
+STREAM/RIVER,46003,Hydrographic Category|intermittent;
+STREAM/RIVER,46006,Hydrographic Category|perennial;
+STREAM/RIVER,46007,Hydrographic Category|ephemeral;
+SUBMERGED STREAM,46100,feature type only: no attributes
+WASH,48400,feature type only: no attributes
+WATER INTAKE/OUTFLOW,48500,feature type only: no attributes
