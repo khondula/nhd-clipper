@@ -355,6 +355,10 @@ nhd_stuff_for_site <- function(my_site, huc2_path){
            nhd_n1ha = nrow(wb_areas1ha)) %>%
   mutate(huc2 = huc2_id)
 
+fs::dir_create('results/fbox-nhd-stats/site')
+fs::dir_create('results/fbox-nhd-stats/flowlines')
+fs::dir_create('results/fbox-nhd-stats/waterbodies')
+fs::dir_create('results/fbox-nhd-stats/wb1ha')
 df %>% write_csv(glue('results/fbox-nhd-stats/site/{my_site}-nhd-stats.csv'))
 fl_df_xType %>% write_csv(glue('results/fbox-nhd-stats/flowlines/{my_site}-nhd-stats-xFCode.csv'))
 wb_df_xType %>% write_csv(glue('results/fbox-nhd-stats/waterbodies/{my_site}-nhd-stats-xFCode.csv'))
@@ -363,6 +367,9 @@ wb_areas1ha %>% write_csv(glue('results/fbox-nhd-stats/wb1ha//{my_site}-nhd-stat
 
 neon_sites_in_huc2[5]
 huc2_paths <- names(neon_sites_in_huc2)
+
+nhd_stuff_for_site(neon_sites_in_huc2[[1]][1], huc2_path[1])
+
 nhd_stuff_for_site('UNDE', huc2_paths[7])
 nhd_stuff_for_site('UNDE', huc2_paths[2])
 nhd_stuff_for_site('NIWO', huc2_paths[10])
